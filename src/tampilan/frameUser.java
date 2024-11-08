@@ -1,10 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package tampilan;
 import java.sql.SQLException;
 import kelas.user;
+import java.sql.ResultSet;
+import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -17,6 +17,46 @@ public class frameUser extends javax.swing.JFrame {
      */
     public frameUser() {
         initComponents();
+        loadTable();
+        reset();
+    }
+    
+    void loadTable(){
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("User name");
+        model.addColumn("Email");
+        model.addColumn("Fullname");
+        model.addColumn("Status");
+        
+        try {
+            user us = new user();
+            ResultSet data = us.tampilUser();
+            
+           while(data.next()){
+               model.addRow(new Object[]{
+                   data.getString("user_name"),
+                   data.getString("user_email"),
+                   data.getString("user_fullname"),
+                   data.getInt("user_status")==1 ? "Aktif" : "Tidak Aktif "
+               
+               });
+        }
+          
+        } catch (SQLException sQLException) {
+        }
+        
+           
+        tUser.setModel(model);
+    }
+    
+    
+    void reset(){
+        tUsername.setText(null);
+        tUsername.setEditable(true);
+        tEmail.setText(null);
+        tFullname.setText(null);
+        tPassword.setText(null);
+        cStatus.setSelectedItem(null);
     }
 
     /**
@@ -39,6 +79,10 @@ public class frameUser extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         cStatus = new javax.swing.JComboBox<>();
         bTambah = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tUser = new javax.swing.JTable();
+        bHapus = new javax.swing.JButton();
+        bUbah = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,6 +105,38 @@ public class frameUser extends javax.swing.JFrame {
             }
         });
 
+        tUser.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tUser.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tUserMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tUser);
+
+        bHapus.setText("hapus");
+        bHapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bHapusActionPerformed(evt);
+            }
+        });
+
+        bUbah.setText("ubah");
+        bUbah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bUbahActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -68,7 +144,13 @@ public class frameUser extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bTambah)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(bTambah)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bHapus)
+                        .addGap(18, 18, 18)
+                        .addComponent(bUbah))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -84,7 +166,7 @@ public class frameUser extends javax.swing.JFrame {
                             .addComponent(tPassword)
                             .addComponent(tFullname)
                             .addComponent(cStatus, 0, 161, Short.MAX_VALUE))))
-                .addContainerGap(146, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -110,15 +192,20 @@ public class frameUser extends javax.swing.JFrame {
                     .addComponent(jLabel5)
                     .addComponent(cStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(33, 33, 33)
-                .addComponent(bTambah)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bTambah)
+                    .addComponent(bHapus)
+                    .addComponent(bUbah))
+                .addGap(27, 27, 27)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(104, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void bTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahActionPerformed
-        // TODO add your handling code here:
+       
         try {
             user user = new user();
             user.setUser_name(tUsername.getText());
@@ -133,7 +220,55 @@ public class frameUser extends javax.swing.JFrame {
             user.tambahUser();
         } catch (SQLException sQLException) {
         }
+        loadTable();
     }//GEN-LAST:event_bTambahActionPerformed
+
+    private void tUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tUserMouseClicked
+     
+        int baris = tUser.rowAtPoint(evt.getPoint());
+        String username = tUser.getValueAt(baris, 0).toString();
+        String email = tUser.getValueAt(baris, 1).toString();
+        String fullname = tUser.getValueAt(baris, 2).toString();
+        String status = tUser.getValueAt(baris, 3).toString();
+        
+        tUsername.setText(username);
+        tUsername.setEditable(false);
+        tEmail.setText(email);
+        tFullname.setText(fullname);
+        cStatus.setSelectedItem(status);
+    }//GEN-LAST:event_tUserMouseClicked
+
+    private void bHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHapusActionPerformed
+    
+        try {
+            user usr = new user();
+            usr.setUser_name(tUsername.getText());
+            usr.hapusUser();
+        } catch (SQLException sQLException) {
+        }
+        loadTable();
+        reset();
+    }//GEN-LAST:event_bHapusActionPerformed
+
+    private void bUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bUbahActionPerformed
+    
+         try {
+            user usr = new user();
+            usr.setUser_name(tUsername.getText());
+            usr.setUser_email(tEmail.getText());
+            usr.setUser_password(tPassword.getText());
+            usr.setUser_fullname(tFullname.getText());
+            if (cStatus.getSelectedItem().equals("Aktif")) {
+                usr.setUser_status(1);
+            } else {
+                usr.setUser_status(0);
+            }
+            usr.ubahUser();
+        } catch (SQLException sQLException) {
+        }
+        loadTable();
+        reset();
+    }//GEN-LAST:event_bUbahActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,16 +306,20 @@ public class frameUser extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bHapus;
     private javax.swing.JButton bTambah;
+    private javax.swing.JButton bUbah;
     private javax.swing.JComboBox<String> cStatus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField tEmail;
     private javax.swing.JTextField tFullname;
     private javax.swing.JPasswordField tPassword;
+    private javax.swing.JTable tUser;
     private javax.swing.JTextField tUsername;
     // End of variables declaration//GEN-END:variables
 }

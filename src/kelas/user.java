@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+ 
 package kelas;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -88,5 +85,109 @@ public class user {
         } catch (SQLException sQLException) {
             JOptionPane.showMessageDialog(null, "user gagal ditambahkan");
         }
+    }
+    public ResultSet tampilUser(){      //harus ada type data ResultSet
+        query = "SELECT* FROM user";   //sesuaikain nama tabelnya
+        try {
+            st = konek.createStatement();
+            rs = st.executeQuery(query);
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "data gagal ditampilkan");
+        }
+       
+        return rs;
+    }
+    public void hapusUser(){
+         query = "DELETE FROM user WHERE user_name = ?";
+        try {
+            ps = konek.prepareStatement(query);
+            ps.setString(1, user_name);
+           
+            ps.executeUpdate();
+            ps.close();
+            
+            JOptionPane.showMessageDialog(null, "user berhasil dihapus");
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "user gagal dihapus");
+        }
+    }
+    
+    public void ubahUser(){
+        if(user_password.equals("")){   //ketika password tdk dirubah
+            
+            query = "UPDATE user SET user_email= ?,"
+                    + " user_fullname= ?, "
+                    + "user_status= ?"
+                    + " WHERE user_name= ?";  //muncul sendiri +
+            try {
+            ps = konek.prepareStatement(query);
+            ps.setString(1, user_email);
+            ps.setString(2, user_fullname);
+            ps.setInt(3, user_status);
+            ps.setString(4, user_name);
+            
+            ps.executeUpdate();
+            ps.close();
+            
+            JOptionPane.showMessageDialog(null, "user berhasil diubah");
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "user gagal diubah");
+        }
+            
+            
+        }else{
+            
+            query = "UPDATE user SET user_email= ?,"
+                    + " user_fullname= ?, "
+                    + " user_status= ?, "
+                    + " user_password= MD5(?)"
+                    + " WHERE user_name= ?";  
+            try {
+            ps = konek.prepareStatement(query);
+            
+            ps.setString(1, user_email);
+            ps.setString(2, user_fullname);
+            ps.setInt(3, user_status);
+            ps.setString(4, user_password);
+            ps.setString(5, user_name);
+            
+            ps.executeUpdate();
+            ps.close();
+            
+            JOptionPane.showMessageDialog(null, "user berhasil diubah");
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "user gagal diubah");
+        }
+        }
+    }
+    public void login(){
+        query = "SELECT * FROM user WHERE user_name = ? AND user_password = MD5(?)";
+        try {
+            ps = konek.prepareStatement(query);
+            ps.setString(1, user_name);
+            ps.setString(2, user_password);  
+            rs = ps.executeQuery();
+            
+                        
+            if(rs.next()){  //mengembalikan nilai
+               sesi.setStatus("Aktif");
+               sesi.setNama(rs.getString("user_fullname"));
+               sesi.setEmail(rs.getString("user_email"));
+               sesi.setUsername(rs.getString("user_name"));
+            }else{
+               sesi.setStatus("Tidak Aktif");
+               JOptionPane.showMessageDialog(null, "Username atau Password salah");
+            }
+        } catch (SQLException sQLException) {
+            JOptionPane.showMessageDialog(null, "Login  gagal ");
+        }
+    }
+    
+    public void logOut(){
+        sesi.setStatus("");
+        sesi.setEmail("");
+        sesi.setNama("");
+        sesi.setUsername("");
+        
     }
 }
